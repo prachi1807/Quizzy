@@ -1,15 +1,28 @@
 <!doctype html>
 <html>
   <head>
-    <title>FLASK CSV File Upload</title>
+    <title>Attempt your Quiz!</title>
   </head>
   <body>
-    <h1>Upload your CSV file</h1>
+    <h1>Take the test here</h1>
+
     <form method="POST" action="" enctype="multipart/form-data">
-      <label>Enter the Quiz Name: <input type="text", name="q_name"></label>  <br>
-      <label>Please select your question file: <input type="file", name="file"></label><br>
-      <input type="submit" value="Submit">
-    </form>
+    
+      {% for n in range(length) %}
+      
+    
+      <label>{{rows[n][1]}}</label><br>
+      <input type="radio" name={{n}} value="1" required> {{rows[n][2]}} <br>  
+      <input type="radio" name={{n}} value="2"> {{rows[n][3]}} <br>  
+      <input type="radio" name={{n}} value="3"> {{rows[n][4]}} <br>
+      <input type="radio" name={{n}} value="4"> {{rows[n][5]}} <br>
+    
+    {% endfor %}
+    <input type="submit" value="Click to view score"> 
+  </form>
+    
+
   </body>
 </html>
+
 

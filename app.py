@@ -2,7 +2,7 @@ import os
 import pathlib
 
 import requests
-from flask import Flask, session, abort, redirect, request, render_template
+from flask import Flask, session, abort, redirect, request, render_template, url_for
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
@@ -11,8 +11,21 @@ import mysql.connector
 
 from functools import wraps
 
+from coolname import generate_slug
+import pandas as pd
+
 app = Flask("Google Login App")
-app.secret_key = "CodeSpecialist.com"
+app.secret_key = "Quizzy"
+
+
+con = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="root",
+  database="quizzy"
+)
+
+cursor = con.cursor()
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -70,12 +83,12 @@ def callback():
         audience=GOOGLE_CLIENT_ID
     )
 
-    con = mysql.connector.connect(host='localhost', user='root', password='root')
-    cursor = con.cursor()
-    con.commit()
+    # con = mysql.connector.connect(host='localhost', user='root', password='root')
+    # cursor = con.cursor()
+    # con.commit()
 
-    cursor.execute("CREATE DATABASE IF NOT EXISTS quizzy;")
-    cursor.execute("USE quizzy;")
+    # cursor.execute("CREATE DATABASE IF NOT EXISTS quizzy;")
+    # cursor.execute("USE quizzy;")
     
     
     cursor.execute("CREATE TABLE IF NOT EXISTS users(UserID int(50) AUTO_INCREMENT, Name varchar(50) NOT NULL, Email varchar(100) NOT NULL, PRIMARY KEY (UserId));")
@@ -109,7 +122,7 @@ def logout():
 
 @app.route("/")
 def index():
-    return "Hello World <a href='/login'><button>Login</button></a>"
+    return "Click here to Login <a href='/login'><button>Login</button></a>"
 
 
 @app.route("/landing_page")
@@ -123,29 +136,114 @@ UPLOAD_FOLDER = 'static/files'
 app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
 
 
+def parseCSV(filePath, quiz_id):
+
+    # CSV Column Names
+    col_names = ['q_desc','option_one','option_two', 'option_three', 'option_four' , 'correct_option', 'q_marks']
+    
+    # Use Pandas to parse the CSV file
+    csvData = pd.read_csv(filePath,names=col_names, header=None)
+
+
+    # create the questions table
+    cursor.execute("CREATE TABLE IF NOT EXISTS QUESTIONS (quiz_id varchar(100) NOT NULL, q_desc varchar(100) NOT NULL, option_one varchar(100) NOT NULL, option_two varchar(100) NOT NULL, option_three varchar(100) NOT NULL, option_four varchar(100) NOT NULL, correct_option varchar(100) NOT NULL, q_marks int(100) NOT NULL, CONSTRAINT fk_questions FOREIGN KEY (quiz_id) REFERENCES QUIZ(quiz_id) ON DELETE CASCADE ON UPDATE CASCADE);")
+
+    # Loop through the Rows
+    total_marks = 0
+    for i,row in csvData.iterrows():
+        total_marks += row['q_marks']
+        sql = "INSERT INTO questions (quiz_id, q_desc, option_one, option_two, option_three, option_four, correct_option, q_marks) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        value = (quiz_id, row['q_desc'],row['option_one'],row['option_two'],row['option_three'],row['option_four'],row['correct_option'], row['q_marks'])
+        cursor.execute(sql, value)
+        con.commit()
+
+    cursor.execute("UPDATE QUIZ SET total_marks = %s where quiz_id = %s;", (total_marks, quiz_id))
+    con.commit()
+
 @app.route("/landing_page/create_quiz")
 @login_is_required
 def create_quiz():
-    return render_template('questions.html')
+    return render_template('create_quiz.html')
 
 # Get the uploaded files
 @app.route("/landing_page/create_quiz", methods=['POST'])
 def createQuiz():
-      # get the uploaded file
-      quiz_name = request.form.get('q_name')
-      uploaded_file = request.files['file']
-      if uploaded_file.filename != '':
-           file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-          # set the file path
-           uploaded_file.save(file_path)
-          # save the file
-      return "<p>Your quiz {:s}  is created</p>".format(quiz_name)
+    
+    # create unique quiz details
+    quiz_id = generate_slug(2)
+    quiz_name = request.form.get('q_name')
+    
+    # Add to database
 
+    # Create Quiz table
+    cursor.execute("CREATE TABLE IF NOT EXISTS QUIZ(quiz_id varchar(100) NOT NULL PRIMARY KEY, quiz_name varchar(100) NOT NULL, total_marks int(100));")
+    con.commit()
 
-@app.route("/landing_page/take_quiz")
+    # enter quiz details into the db
+    cursor.execute("INSERT INTO QUIZ(quiz_id, quiz_name) VALUES (%s, %s);", (quiz_id, quiz_name))
+    con.commit()
+    
+    # get the uploaded file
+    uploaded_file = request.files['file']
+    
+    if uploaded_file.filename != '':
+        # set the file path
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+        
+        # save the file
+        uploaded_file.save(file_path)
+         
+        parseCSV(file_path, quiz_id)
+      
+    return "<p>Your quiz {:s} is created and unique test ID is {:s}</p>".format(quiz_name, quiz_id)
+    
+
+entered_answers = []
+
+@app.route("/landing_page/take_quiz", methods=['GET','POST'])
 @login_is_required
 def take_quiz():
-    return "You can take quizzes here"
+    global entered_answers
+    if request.method == 'POST':
+        received_id  = request.form.get('q_id')
+        # print(received_id)
+        return redirect(url_for('new_route', received_id=received_id))
+
+    return render_template('take_quiz.html')
+
+@app.route('/landing_page/take_quiz/<string:received_id>', methods=['GET','POST'])
+def new_route(received_id):
+      
+    cursor.execute("SELECT * from QUESTIONS where quiz_id = %s",(received_id,))
+    rows = cursor.fetchall()
+
+    if request.method == 'POST':
+        for i in range(len(rows)):
+            answer = request.form.get(str(i))
+            entered_answers.append(answer)
+        # print(entered_answers)
+        return redirect(url_for('view_score', received_id=received_id))
+
+    return render_template('questions.html', rows = rows, length = len(rows))
+
+@app.route('/viewscore/<string:received_id>', methods=['GET','POST'])
+def view_score(received_id):
+    cursor.execute("SELECT correct_option from QUESTIONS where quiz_id = %s",(received_id,))
+    answers = cursor.fetchall()
+
+    cursor.execute("SELECT q_marks from QUESTIONS where quiz_id = %s",(received_id,))
+    marks = cursor.fetchall()      
+      
+    score = 0
+    for i in range(len(answers)):
+        if answers[i][0] == entered_answers[i]:
+            score += marks[i][0]
+    # print(len(answers))
+    # print(marks)
+    # print(answers)
+    # print(entered_answers)
+    return "Your score is: {:d}".format(score)
+
 
 
 if __name__ == "__main__":
