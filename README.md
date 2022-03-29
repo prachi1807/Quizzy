@@ -23,3 +23,6 @@ Run the program using
 ```bash
 python app.py or flask run
 ```
+
+### Created Quizzes
+1. abiding-bullfrog
