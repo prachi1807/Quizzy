@@ -15,7 +15,7 @@ from functools import wraps
 from coolname import generate_slug
 import pandas as pd
 
-app = Flask("Fynd Quiz App")
+app = Flask("Quiz App")
 app.secret_key = "Quizzy"
 
 
