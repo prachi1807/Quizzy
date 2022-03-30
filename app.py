@@ -118,13 +118,13 @@ def logout():
 
 @app.route("/")
 def index():
-    return "Click here to Login <a href='/login'><button>Login</button></a>"
+    return render_template("login.jinja")
 
 
 @app.route("/landing_page")
 @login_is_required
 def landing_page():
-    return f"Hello {session['name']}! <br/> <a href='/landing_page/create_quiz'><button>Create Quiz</button></a> <br/> <a href='/landing_page/take_quiz'><button>Take Quiz</button></a> <br/> <a href='/logout'><button>Logout</button></a>"
+    return render_template("landing_page.jinja", name = session['name'])
 
 
 # Upload folder
