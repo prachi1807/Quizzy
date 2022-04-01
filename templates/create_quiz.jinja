@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Create Quiz</title>
+{% endblock %}
+
+{% block body %}
+    <div style="text-align: center;">
+      <h3>Upload your CSV file</h3>
+      <form method="POST" action="" enctype="multipart/form-data">
+        <label>Enter the Quiz Name: <input type="text", name="q_name"></label>  <br>
+        <label>Please select your question file: <input type="file", name="file"></label><br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+    
+{% endblock %}
+
+
+

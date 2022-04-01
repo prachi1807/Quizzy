@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>{{ test_id }}</title>
+{% endblock %}
+
+{% block body %}
+    <div style="text-align: center;">
+      
+      <h2>Take the test here</h2>
+
+      <form method="POST" action="" enctype="multipart/form-data" style="text-align: left;">
+      
+        {% for n in range(length) %}
+        
+      
+        <label>{{n+1}}] {{rows[n][1]}}</label><br>
+        <input type="radio" name={{n}} value="1" required> {{rows[n][2]}} <br>  
+        <input type="radio" name={{n}} value="2"> {{rows[n][3]}} <br>  
+        <input type="radio" name={{n}} value="3"> {{rows[n][4]}} <br>
+        <input type="radio" name={{n}} value="4"> {{rows[n][5]}} <br><br>
+      
+      {% endfor %}
+      <input type="submit" value="Click to view score"> 
+    </form>
+      
+  
+    </div>
+    
+{% endblock %}
+
+
+

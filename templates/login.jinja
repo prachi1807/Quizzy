@@ -2,13 +2,30 @@
 
 {% block head %}
     <title>Login</title>
+    <style>
+        button {
+            --button_radius: 0.5em;
+            --button_color: #e8e8e8;
+            --button_outline_color: #bef1ec;
+            font-size: 100%;
+            font-weight: bold;
+            border: none;
+            border-radius: var(--button_radius);
+            padding: 0.7em 1.7em;
+            background: var(--button_outline_color);
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
     <div style="text-align: center;">
         <h1 style="font-family: Lucida Handwriting;">Welcome to Quizzy</h1> <br>
-        <a href='/login'><button>Login</button></a>
+        <a href='/login'>
+            <button>Login</button>
+        </a>
     </div>
     
 {% endblock %}
+
+
 
