@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+   <body>
+
+    <h3>Student performance for {{ test_id }} quiz</h3>
+      <table border = 1>
+         <thead>
+            <td>Student ID</td>
+            <td>Marks Scpred</td>
+            <td>Total Marks</td>
+         </thead>
+         
+         {% for row in rows %}
+            <tr>
+               <td>{{row[1]}}</td>
+               <td>{{row[3]}}</td>
+               <td>{{row[4]}}</td>
+            </tr>
+         {% endfor %}
+      </table>
+      
+   </body>
+</html>
+
+
+
