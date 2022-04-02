@@ -2,7 +2,7 @@ import os
 import pathlib
 
 import requests
-from flask import Flask, session, abort, redirect, request, render_template, url_for
+from flask import Flask, session, abort, redirect, request, render_template, url_for, send_file
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
@@ -151,7 +151,9 @@ def parseCSV(filePath, quiz_id):
     # Loop through the Rows
     total_marks = 0
     for i,row in csvData.iterrows():
-        total_marks += row['q_marks']
+        if i==0:
+            continue
+        total_marks += int(row['q_marks'])
         sql = "INSERT INTO questions (quiz_id, q_desc, option_one, option_two, option_three, option_four, correct_option, q_marks) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         value = (quiz_id, row['q_desc'],row['option_one'],row['option_two'],row['option_three'],row['option_four'],row['correct_option'], row['q_marks'])
         cursor.execute(sql, value)
@@ -159,6 +161,9 @@ def parseCSV(filePath, quiz_id):
 
     cursor.execute("UPDATE QUIZ SET total_marks = %s where (quiz_id = %s);", (total_marks, quiz_id))
     con.commit()
+
+    # Delete the file after we've processed the data
+    os.remove(filePath)
 
 @app.route("/landing_page/create_quiz")
 @login_is_required
@@ -195,7 +200,10 @@ def createQuiz():
         parseCSV(file_path, quiz_id)
       
     return "<p>Your quiz {:s} is created and unique test ID is {:s}</p>".format(quiz_name, quiz_id)
-    
+
+@app.route('/download')
+def download_file():
+	return send_file("static/files/Quiz_Template.csv", as_attachment=True)    
 
 entered_answers = []
 
