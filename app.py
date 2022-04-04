@@ -19,20 +19,13 @@ app = Flask("Quiz App")
 app.secret_key = "Quizzy"
 
 
-# PostgreSQL local connection
+# Database Connection
 con = psycopg2.connect(
-  host="localhost",
-  user="postgres",
-  password="root",
-  database="quizzy"
+  host=os.environ.get("DB_HOST"),
+  user=os.environ.get("DB_USER"),
+  password=os.environ.get("DB_PASSWORD"),
+  database=os.environ.get("DB_DATABASE")
 )
-
-# # Postgres For Heroku
-# con = psycopg2.connect(
-#     host="ec2-3-225-213-67.compute-1.amazonaws.com",
-#     database="d8ouraiosoe3eh",
-#     user="nbpkzywlljycen",
-#     password="d2d09692902b440dc8f127b45bead93c26b50513c6a4388ebc98d0dc472417f4")
 
 cursor = con.cursor()
 

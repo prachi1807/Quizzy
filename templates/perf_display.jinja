@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block head %}
+   <title>Create Quiz</title>
+   <style>
+      .center{ 
+         height: 100vh;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: rgb(236,201,185);
+         background: linear-gradient(90deg, rgba(236,201,185,1) 50%, rgba(173,207,217,1) 98%);
+         font-size: 120%;
+      }
+   </style>
+{% endblock %}
+
+{% block body %}
+    <div style="text-align: center;">
+      <h3>Student performance for {{ test_id }} quiz</h3>
+      <table border = 1>
+         <thead>
+            <td>Student Name</td>
+            <td>Marks Scpred</td>
+            <td>Total Marks</td>
+         </thead>
+         
+         {% for row in rows %}
+            <tr>
+               <td>{{row[1]}}</td>
+               <td>{{row[3]}}</td>
+               <td>{{row[4]}}</td>
+            </tr>
+         {% endfor %}
+      </table>
+    </div>
+    
+{% endblock %}
