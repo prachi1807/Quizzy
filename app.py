@@ -7,7 +7,6 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-import mysql.connector
 import psycopg2
 
 from functools import wraps
@@ -52,7 +51,7 @@ flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
     redirect_uri="http://127.0.0.1:5000/callback"
-    # redirect_uri="https://try-heroku-prachi.herokuapp.com/callback"
+    # redirect_uri="https://qui-zzy.herokuapp.com/callback"
 )
 
 
