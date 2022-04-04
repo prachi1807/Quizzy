@@ -89,10 +89,6 @@ def callback():
         request=token_request,
         audience=GOOGLE_CLIENT_ID
     )
-
-
-    # cursor.execute("CREATE DATABASE IF NOT EXISTS quizzy;")
-    # cursor.execute("USE quizzy;")
     
     cursor.execute("SELECT * FROM users WHERE (Email = %s AND Name = %s);", (id_info.get("email"), id_info.get("name"), ))
     account = cursor.fetchone()
