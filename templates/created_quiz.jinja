@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Success</title>
+    <style>
+        button {
+            --button_radius: 0.5em;
+            --button_color: #e8e8e8;
+            --button_outline_color: #bef1ec;
+            font-size: 80%;
+            font-weight: bold;
+            border: none;
+            border-radius: var(--button_radius);
+            padding: 0.7em 1.7em;
+            background: var(--button_outline_color);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="text-align: center;">
+        <h4>Your quiz {{ quiz_name }} is created and unique test ID is {{ quiz_id }}<h4>
+        <a href='/landing_page'><button>Back</button></a>
+    </div>
+    
+{% endblock %}
+
+

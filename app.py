@@ -187,7 +187,7 @@ def createQuiz():
          
         parseCSV(file_path, quiz_id)
       
-    return "<p>Your quiz {:s} is created and unique test ID is {:s}</p>".format(quiz_name, quiz_id)
+    return render_template('created_quiz.jinja', quiz_name = quiz_name, quiz_id = quiz_id)  
 
 @app.route('/download')
 def download_file():
@@ -245,7 +245,7 @@ def view_score(received_id):
     cursor.execute("INSERT INTO ATTEMPTS VALUES (%s, %s, %s, %s, %s);", (u_id[0], session["name"], received_id, score, total_marks))
     con.commit()
     
-    return "Your score is: {:d}/{:d}".format(score, total_marks[0])
+    return render_template('show_score.jinja', score = score, total_marks = total_marks[0])
 
 
 @app.route("/landing_page/performance", methods=['GET','POST'])
