@@ -8,9 +8,9 @@
     <div style="text-align: center;">
       <h3>Upload your CSV file</h3>
       <form method="POST" action="" enctype="multipart/form-data">
-        <label>Enter the Quiz Name: <input type="text", name="q_name"></label>  <br>
+        <label>Enter the Quiz Name: <input type="text", name="q_name" required></label>  <br>
         <a href="{{ url_for('download_file') }}">Click here to download CSV template</a> <br>
-        <label>Please select your question file: <input type="file", name="file"></label><br>
+        <label>Please select your question file: <input type="file", name="file" required></label><br>
         <input type="submit" value="Submit">
       </form>
     </div>
