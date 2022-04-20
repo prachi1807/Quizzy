@@ -28,5 +28,4 @@ python app.py or flask run
 ```
 
 ### Quiz Codes for Created Quizzes
-1. impartial-uakari
-2. incredible-cat
+1. copper-serval
