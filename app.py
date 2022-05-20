@@ -44,7 +44,6 @@ con.commit()
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-GOOGLE_CLIENT_ID = "80687604948-vvo4h9b9ocbk3aso2o1fg5qil9hm2ept.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
@@ -87,7 +86,7 @@ def callback():
     id_info = id_token.verify_oauth2_token(
         id_token=credentials._id_token,
         request=token_request,
-        audience=GOOGLE_CLIENT_ID
+        audience=os.environ.get("GOOGLE_CLIENT_ID")
     )
     
     cursor.execute("SELECT * FROM users WHERE (Email = %s AND Name = %s);", (id_info.get("email"), id_info.get("name"), ))
